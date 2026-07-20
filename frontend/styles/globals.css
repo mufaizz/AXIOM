@@ -1,0 +1,22 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #0b0f17;
+  --fg: #e2e8f0;
+  --accent: #6366f1;
+}
+
+html, body, #__next { height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: Inter, system-ui, sans-serif;
+}
+
+.scrollbar-thin::-webkit-scrollbar { width: 8px; height: 8px; }
+.scrollbar-thin::-webkit-scrollbar-thumb { background: #2a3142; border-radius: 4px; }
+
+.katex-display { overflow-x: auto; overflow-y: hidden; padding: 0.5rem 0; }

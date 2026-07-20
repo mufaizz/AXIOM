@@ -1,0 +1,60 @@
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: mathviz_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: mathviz
+      POSTGRES_PASSWORD: mathviz
+      POSTGRES_DB: mathviz
+    ports:
+      - "5432:5432"
+    volumes:
+      - ../postgres_data:/var/lib/postgresql/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
+  redis:
+    image: redis:7-alpine
+    container_name: mathviz_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - ../redis_data:/data
+
+  backend:
+    build:
+      context: ..
+      dockerfile: docker/backend/Dockerfile
+    container_name: mathviz_backend
+    restart: unless-stopped
+    env_file:
+      - ../.env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://mathviz:mathviz@postgres:5432/mathviz
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      - postgres
+      - redis
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: docker/frontend/Dockerfile
+    container_name: mathviz_frontend
+    restart: unless-stopped
+    env_file:
+      - ../.env
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000/api/v1
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+
+volumes:
+  postgres_data:
+  redis_data:
